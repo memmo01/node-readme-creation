@@ -1,8 +1,8 @@
-let path = require("path");
-let fs = require("fs");
+const path = require("path");
+const fs = require("fs");
 const inquirer = require("inquirer");
-let githubReadme = require("./questions/github.js");
-let readmeCreation = require("./text-file-creation/readme.js");
+const githubReadme = require("./questions/github.js");
+const readmeCreation = require("./text-file-creation/readme.js");
 
 let readmeAnswers;
 
@@ -61,9 +61,20 @@ function updateReadMeAnswers(url, credit, license) {
   readmeAnswers.urlInput = url;
   readmeAnswers.creditInput = credit;
   readmeAnswers.licenseInput = license;
+
+  saveFile(readmeCreation(readmeAnswers));
 }
 
-readmeCreation(readmeAnswers);
+//add data to the readme file
+function saveFile(data) {
+  fs.writeFile("README.md", data, function (err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("readme created successfully");
+    }
+  });
+}
 
 //separate function from the readme creator
 function studentGradeCreate() {
