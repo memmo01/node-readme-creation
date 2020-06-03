@@ -20,7 +20,7 @@ inquirer
   });
 
 function githubCreate() {
-  inquirer.prompt(githubReadme).then((answers) => {
+  inquirer.prompt(githubReadme.main).then((answers) => {
     console.log(answers);
   });
 }
