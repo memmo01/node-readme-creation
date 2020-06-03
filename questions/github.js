@@ -16,6 +16,16 @@ module.exports = {
       message: "Please write a short description about the project",
     },
     {
+      type: "input",
+      name: "installation",
+      message: "Enter instructions about how to install application",
+    },
+    {
+      type: "input",
+      name: "usage",
+      message: "Enter information about how to use the application",
+    },
+    {
       type: "confirm",
       message: "Do you have a live url of the project?",
       name: "liveurl",
