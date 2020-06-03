@@ -37,16 +37,18 @@ module.exports = {
     message: "Enter the url of the live project",
     name: "urlInput",
   },
-
-  licenceList: {
-    type: "list",
-    message: "Which license do you have",
-    name: "licenseInput",
-    choices: ["MIT", "APACHE 2.0", "GPL 3.0", "BSD 3"],
-  },
   creditInput: {
     type: "input",
     message: "List who you want to give credit to",
     name: "creditInput",
   },
+
+  licenseList: {
+    type: "list",
+    message: "Which license do you have",
+    name: "licenseInput",
+    choices: ["MIT", "APACHE 2.0", "GPL 3.0", "BSD 3"],
+  },
+
+  responseQuestion: [],
 };
