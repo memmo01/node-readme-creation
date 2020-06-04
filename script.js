@@ -79,12 +79,6 @@ function saveFile(filepath, data) {
   });
 }
 
-// fs.readFileSync("./readme_created/readme.md", "utf-8", function (r, j) {
-//   console.log(j)
-// })
-
-//separate function from the readme creator
-
 //**** student grading section of program ****/
 
 //constructor for building object about student
@@ -132,7 +126,7 @@ function studentGradeCreate() {
       } else {
         console.log("thank you we will now send information to a text file");
         saveFile(
-          "./readme_created/week" + week + ".txt",
+          "./readme_created/hwgrades/week" + week + ".txt",
           JSON.stringify(gradeQuestions.results)
         );
       }
