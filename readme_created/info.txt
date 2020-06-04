@@ -1,1 +1,1 @@
-your new readme file will appear in this folder ( readme_created )
+your new readme and text files will appear in this folder ( readme_created )
