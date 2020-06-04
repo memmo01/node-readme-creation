@@ -3,8 +3,10 @@ const fs = require("fs");
 const inquirer = require("inquirer");
 const githubReadme = require("./questions/github.js");
 const readmeCreation = require("./text-file-creation/readme.js");
-
+const gradeQuestions = require("./questions/grading.js")
 let readmeAnswers;
+let assignment;
+let week;
 
 //initialize application with question about what type of readme to create
 inquirer
@@ -76,7 +78,33 @@ function saveFile(data) {
   });
 }
 
+
+fs.readFileSync("./readme_created/readme.md", "utf-8", function (r, j) {
+  console.log(j)
+})
+
 //separate function from the readme creator
 function studentGradeCreate() {
   console.log("start student grade app");
+
+
+  inquirer.prompt(gradeQuestions.assignmentInput).then(function (res) {
+
+    assignment = res.assignment_name
+    week = res.week_num
+
+
+  })
+  //i want a function that will add 1. student homework assignment, 2. student name , 3. student grades, 4. comments left 5. date added to a text file
+
+
+
+}
+
+
+function createGrade(assignment, week, name, grade, comments) {
+  this.assignment = assignment;
+  this.week = week;
+  this.grade = grade;
+  this.comments = comments
 }
