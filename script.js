@@ -67,7 +67,7 @@ function updateReadMeAnswers(url, credit, license) {
 
 //add data to the readme file
 function saveFile(data) {
-  fs.writeFile("README.md", data, function (err) {
+  fs.writeFile("./readme_created/README.md", data, function (err) {
     if (err) {
       console.log(err);
     } else {
