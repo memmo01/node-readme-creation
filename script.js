@@ -5,6 +5,7 @@ const githubReadme = require("./questions/github.js");
 const readmeCreation = require("./text-file-creation/readme.js");
 const gradeQuestions = require("./questions/grading.js")
 let readmeAnswers;
+//global variables for assignment and week grading part of app is working with
 let assignment;
 let week;
 
@@ -84,6 +85,8 @@ fs.readFileSync("./readme_created/readme.md", "utf-8", function (r, j) {
 })
 
 //separate function from the readme creator
+
+//get information about the week and assignment
 function studentGradeCreate() {
   console.log("start student grade app");
 
@@ -93,18 +96,43 @@ function studentGradeCreate() {
     assignment = res.assignment_name
     week = res.week_num
 
+    addStudentInfo()
 
   })
-  //i want a function that will add 1. student homework assignment, 2. student name , 3. student grades, 4. comments left 5. date added to a text file
 
+  //update information about the week and assignment with student information (name, grade, comments). Place it into a constructor and push it to an object to use later
+  function addStudentInfo() {
+    inquirer.prompt(gradeQuestions.gradeInput).then(function (res) {
+      let x = new submission(assignment, week, res.student_name, res.grade, res.comments)
+
+      gradeQuestions.results.push(x)
+      console.log(gradeQuestions.results)
+      checkForMore()
+    })
+
+  }
+
+  //check if more students need to be added
+  function checkForMore() {
+    inquirer.prompt(gradeQuestions.addMore).then(function (res) {
+      if (res.add_more) {
+        addStudentInfo()
+      }
+      else {
+        console.log("thank you we will now send information to a text file")
+      }
+    })
+
+  }
 
 
 }
 
-
-function createGrade(assignment, week, name, grade, comments) {
+//constructor for building object about student
+function submission(assignment, week, name, grade, comments) {
   this.assignment = assignment;
   this.week = week;
+  this.name = name;
   this.grade = grade;
   this.comments = comments
 }
