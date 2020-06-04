@@ -24,5 +24,11 @@ module.exports = {
         message: "Enter Comments",
         name: "comments",
 
-    }]
+    }],
+    addMore: {
+        type: "confirm",
+        name: "add_more",
+        message: "Would you like to submit another student input?"
+    },
+    results: []
 }
