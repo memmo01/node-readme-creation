@@ -1,4 +1,6 @@
 module.exports = function (obj) {
+  //get badge link here. 1 . get username info. 2 .get repo info. 3. get variable 4. add variable to the readme
+
   function checkTOC(topicObj, title, hash) {
     if (topicObj) {
       return `* [${title}](${hash})`;
@@ -28,9 +30,13 @@ module.exports = function (obj) {
   //   add title
 
   return `# ${obj.githubTitle}
+
+  ![](https://img.shields.io/github/languages/top/${obj.githubusername}/${
+    obj.repo
+  })
   
   ## Description
-
+  
   ${obj.description}
   ${checkLiveLink()}
   

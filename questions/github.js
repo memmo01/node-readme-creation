@@ -7,6 +7,11 @@ module.exports = {
     },
     {
       type: "input",
+      message: "What is your github repo name",
+      name: "repo",
+    },
+    {
+      type: "input",
       message: "What is the title of your project?",
       name: "githubTitle",
     },
