@@ -4,10 +4,13 @@ const inquirer = require("inquirer");
 const githubReadme = require("./questions/github.js");
 const readmeCreation = require("./text-file-creation/readme.js");
 const gradeQuestions = require("./questions/grading.js");
+const gradeSearchQuestions = require("./questions/grade-search.js");
+const hmwkSearch = require("./components/hmwk-search.js");
 let readmeAnswers;
 //global variables for assignment and week grading part of app is working with
 let assignment;
 let week;
+let hmwkWeekData;
 
 //initialize application with question about what type of readme to create
 inquirer
@@ -16,13 +19,21 @@ inquirer
       type: "list",
       name: "readmetype",
       message: "What type of Readme file do you want to build?",
-      choices: ["Github Readme", "Student Grade List"],
+      choices: ["Github Readme", "Add Weekly Homework Grades", "Search Grades"],
     },
   ])
   .then((answer) => {
-    answer.readmetype === "Github Readme"
-      ? githubCreate()
-      : studentGradeCreate();
+    switch (answer.readmetype) {
+      case "Github Readme":
+        githubCreate();
+        break;
+      case "Student Grade List":
+        studentGradeCreate();
+        break;
+      case "Search Grades":
+        studentGradeSearch();
+        break;
+    }
   });
 
 function githubCreate() {
@@ -125,6 +136,7 @@ function studentGradeCreate() {
         addStudentInfo();
       } else {
         console.log("thank you we will now send information to a text file");
+        checkPath();
         saveFile(
           "./readme_created/hwgrades/week" + week + ".txt",
           JSON.stringify(gradeQuestions.results)
@@ -132,4 +144,60 @@ function studentGradeCreate() {
       }
     });
   }
+
+  function checkPath() {
+    let dir = "./readme_created/hwgrades";
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    } else {
+      return;
+    }
+  }
+}
+
+//**********student grade search section**********
+
+function studentGradeSearch(newMessage) {
+  let message = "Welcome to 'Grade Search' !";
+
+  if (newMessage) {
+    message = newMessage;
+  }
+  console.log(message);
+  inquirer.prompt(gradeSearchQuestions.weekSearch).then(function (res) {
+    console.log(res);
+    //if res is not a number then alert user and run app again
+
+    if (!isNaN(res.hmwk_week)) {
+      hmwkWeekData = hmwkSearch.searchFile(res.hmwk_week, fs);
+      sortQuestions();
+    } else {
+      studentGradeSearch("***You can only enter in a number for this input***");
+    }
+
+    //grab week information from file and then save it in an array to access if needed later. Then start a new function too parse through it based on what the user is looking for
+  });
+}
+
+//allows user to search through data by: name, grade, or show all
+function sortQuestions() {
+  inquirer.prompt(gradeSearchQuestions.sortQuestion).then(function (res) {
+    if (res.sort_q === "Show All") {
+      hmwkSearch.showData(hmwkWeekData, "all");
+    }
+    if (res.sort_q === "Search By Student Name") {
+      inquirer.prompt(gradeSearchQuestions.studentSearch).then(function (res) {
+        hmwkSearch.showData(hmwkWeekData, "name", res.student);
+      });
+    }
+    if (res.sort_q === "Search by Grade") {
+      inquirer.prompt(gradeSearchQuestions.gradeSearch).then(function (res) {
+        hmwkSearch.showData(hmwkWeekData, "grade", res.hmwkgrade);
+      });
+    }
+
+    if (res.sort_q === "Back to Assignment Search") {
+      studentGradeSearch();
+    }
+  });
 }
