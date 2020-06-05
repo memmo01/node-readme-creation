@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const inquirer = require("inquirer");
 const githubReadme = require("./questions/github.js");
-const readmeCreation = require("./text-file-creation/readme.js");
+const readmeCreation = require("./components/readme-creation.js");
 const gradeQuestions = require("./questions/grading.js");
 const gradeSearchQuestions = require("./questions/grade-search.js");
 const hmwkSearch = require("./components/hmwk-search.js");
@@ -27,7 +27,7 @@ inquirer
       case "Github Readme":
         githubCreate();
         break;
-      case "Student Grade List":
+      case "Add Weekly Homework Grades":
         studentGradeCreate();
         break;
       case "Search Grades":
