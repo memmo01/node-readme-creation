@@ -6,6 +6,8 @@ const readmeCreation = require("./components/readme-creation.js");
 const gradeQuestions = require("./questions/grading.js");
 const gradeSearchQuestions = require("./questions/grade-search.js");
 const hmwkSearch = require("./components/hmwk-search.js");
+const ProgressBar = require("progress");
+
 let readmeAnswers;
 //global variables for assignment and week grading part of app is working with
 let assignment;
@@ -52,7 +54,6 @@ function githubCreate() {
 //go through the answers and if there are yes answers to the confirm statements then load a question to gather more information about it
 
 function checkConfirmQuestions(answers) {
-  console.log(readmeAnswers);
   if (answers.liveurl) {
     githubReadme.responseQuestion.push(githubReadme.liveUrl);
   }
@@ -88,12 +89,25 @@ function updateReadMeAnswers(url, credit, license) {
 //add data to file
 function saveFile(filepath, data) {
   fs.writeFile(filepath, data, function (err) {
+    progressBarLoad(filepath);
     if (err) {
       console.log(err);
     } else {
-      console.log("file created successfully in " + filepath);
+      console.log("Creating File...");
     }
   });
+}
+
+function progressBarLoad(filepath) {
+  var bar = new ProgressBar(":bar", { total: 20 });
+  var timer = setInterval(function () {
+    bar.tick();
+    if (bar.complete) {
+      console.log("file created successfully in " + filepath);
+
+      clearInterval(timer);
+    }
+  }, 100);
 }
 
 //**** student grading section of program ****/
