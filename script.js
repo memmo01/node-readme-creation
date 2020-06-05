@@ -11,30 +11,36 @@ let readmeAnswers;
 let assignment;
 let week;
 let hmwkWeekData;
-
+initializeApp();
 //initialize application with question about what type of readme to create
-inquirer
-  .prompt([
-    {
-      type: "list",
-      name: "readmetype",
-      message: "What type of Readme file do you want to build?",
-      choices: ["Github Readme", "Add Weekly Homework Grades", "Search Grades"],
-    },
-  ])
-  .then((answer) => {
-    switch (answer.readmetype) {
-      case "Github Readme":
-        githubCreate();
-        break;
-      case "Add Weekly Homework Grades":
-        studentGradeCreate();
-        break;
-      case "Search Grades":
-        studentGradeSearch();
-        break;
-    }
-  });
+function initializeApp() {
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "readmetype",
+        message: "What type of Readme file do you want to build?",
+        choices: [
+          "Github Readme",
+          "Add Weekly Homework Grades",
+          "Search Grades",
+        ],
+      },
+    ])
+    .then((answer) => {
+      switch (answer.readmetype) {
+        case "Github Readme":
+          githubCreate();
+          break;
+        case "Add Weekly Homework Grades":
+          studentGradeCreate();
+          break;
+        case "Search Grades":
+          studentGradeSearch();
+          break;
+      }
+    });
+}
 
 function githubCreate() {
   inquirer.prompt(githubReadme.main).then((answers) => {
@@ -184,20 +190,26 @@ function sortQuestions() {
   inquirer.prompt(gradeSearchQuestions.sortQuestion).then(function (res) {
     if (res.sort_q === "Show All") {
       hmwkSearch.showData(hmwkWeekData, "all");
+      sortQuestions();
     }
     if (res.sort_q === "Search By Student Name") {
       inquirer.prompt(gradeSearchQuestions.studentSearch).then(function (res) {
         hmwkSearch.showData(hmwkWeekData, "name", res.student);
+        sortQuestions();
       });
     }
     if (res.sort_q === "Search by Grade") {
       inquirer.prompt(gradeSearchQuestions.gradeSearch).then(function (res) {
         hmwkSearch.showData(hmwkWeekData, "grade", res.hmwkgrade);
+        sortQuestions();
       });
     }
 
     if (res.sort_q === "Back to Assignment Search") {
       studentGradeSearch();
+    }
+    if (res.sort_q === "Main Menu") {
+      initializeApp();
     }
   });
 }
