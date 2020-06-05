@@ -81,6 +81,7 @@ module.exports = {
 
         for (let i = 0; i <= x; i++) {
           if (grades[i] === studentData.grade) {
+            studentData.num = i;
             return studentData;
           }
         }
@@ -93,15 +94,21 @@ module.exports = {
 
         for (let i = x; i <= grades.length - 1; i++) {
           if (grades[i] === studentData.grade) {
+            studentData.num = i;
             return studentData;
           }
         }
       }
       //searches for grades equal to the input grade
       if (studentData.grade === grade) {
+        studentData.num = i;
         return studentData;
       }
     });
+    student.sort(function (a, b) {
+      return a.num - b.num;
+    });
+
     return student;
   },
 };

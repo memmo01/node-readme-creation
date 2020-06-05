@@ -12,6 +12,7 @@ module.exports = {
       "Search by Grade",
       "Show All",
       "Back to Assignment Search",
+      "Main Menu",
     ],
     name: "sort_q",
   },
