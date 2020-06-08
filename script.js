@@ -7,48 +7,51 @@ const gradeQuestions = require("./questions/grading.js");
 const gradeSearchQuestions = require("./questions/grade-search.js");
 const hmwkSearch = require("./components/hmwk-search.js");
 const ProgressBar = require("progress");
+const mainQuestion = require("./questions/main.js");
 
 let readmeAnswers;
 //global variables for assignment and week grading part of app is working with
 let assignment;
 let week;
 let hmwkWeekData;
-initializeApp();
-//initialize application with question about what type of readme to create
-function initializeApp() {
-  inquirer
-    .prompt([
-      {
-        type: "list",
-        name: "readmetype",
-        message: "What type of Readme file do you want to build?",
-        choices: [
-          "Github Readme",
-          "Add Weekly Homework Grades",
-          "Search Grades",
-        ],
-      },
-    ])
-    .then((answer) => {
-      switch (answer.readmetype) {
-        case "Github Readme":
-          githubCreate();
-          break;
-        case "Add Weekly Homework Grades":
-          studentGradeCreate();
-          break;
-        case "Search Grades":
-          studentGradeSearch();
-          break;
-      }
-    });
+
+function questionPrompt(questionDir) {
+  return inquirer.prompt(questionDir);
 }
 
-function githubCreate() {
-  inquirer.prompt(githubReadme.main).then((answers) => {
-    readmeAnswers = answers;
-    checkConfirmQuestions(answers);
-  });
+function sortMainQAnswer(answer) {
+  switch (answer.readmetype) {
+    case "Github Readme":
+      githubCreate();
+      break;
+    case "Add Weekly Homework Grades":
+      studentGradeCreate();
+      break;
+    case "Search Grades":
+      studentGradeSearch();
+      break;
+  }
+}
+
+initializeApp();
+//initialize application with question about what type of readme to create
+async function initializeApp() {
+  try {
+    let mainQ = await questionPrompt(mainQuestion);
+    sortMainQAnswer(mainQ);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function githubCreate() {
+  try {
+    let githubAnswer = await questionPrompt(githubReadme.main);
+    readmeAnswers = githubAnswer;
+    checkConfirmQuestions(githubAnswer);
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 //go through the answers and if there are yes answers to the confirm statements then load a question to gather more information about it
@@ -68,14 +71,18 @@ function checkConfirmQuestions(answers) {
   loadFollowupQuestions();
 }
 
-function loadFollowupQuestions() {
-  inquirer.prompt(githubReadme.responseQuestion).then((answers) => {
+async function loadFollowupQuestions() {
+  try {
+    let followUpAns = await questionPrompt(githubReadme.responseQuestion);
+
     updateReadMeAnswers(
-      answers.urlInput,
-      answers.creditInput,
-      answers.licenseInput
+      followUpAns.urlInput,
+      followUpAns.creditInput,
+      followUpAns.licenseInput
     );
-  });
+  } catch (err) {
+    console.error(err);
+  }
 }
 //add answers to readmeanswer obj
 function updateReadMeAnswers(url, credit, license) {
@@ -122,108 +129,129 @@ function submission(assignment, week, name, grade, comments) {
 }
 
 //get information about the week and assignment
-function studentGradeCreate() {
-  console.log("start student grade app");
+async function studentGradeCreate() {
+  try {
+    console.log("start student grade app");
 
-  inquirer.prompt(gradeQuestions.assignmentInput).then(function (res) {
-    assignment = res.assignment_name;
-    week = res.week_num;
+    let gradeAns = await questionPrompt(gradeQuestions.assignmentInput);
+
+    assignment = gradeAns.assignment_name;
+    week = gradeAns.week_num;
 
     addStudentInfo();
-  });
-
-  //update information about the week and assignment with student information (name, grade, comments). Place it into a constructor and push it to an object to use later
-  function addStudentInfo() {
-    inquirer.prompt(gradeQuestions.gradeInput).then(function (res) {
-      let x = new submission(
-        assignment,
-        week,
-        res.student_name,
-        res.grade,
-        res.comments
-      );
-
-      gradeQuestions.results.push(x);
-      console.log(gradeQuestions.results);
-      checkForMore();
-    });
+  } catch (err) {
+    console.error(err);
   }
+}
 
-  //check if more students need to be added
-  function checkForMore() {
-    inquirer.prompt(gradeQuestions.addMore).then(function (res) {
-      if (res.add_more) {
-        addStudentInfo();
-      } else {
-        console.log("thank you we will now send information to a text file");
-        checkPath();
-        saveFile(
-          "./readme_created/hwgrades/week" + week + ".txt",
-          JSON.stringify(gradeQuestions.results)
-        );
-      }
-    });
+//update information about the week and assignment with student information (name, grade, comments). Place it into a constructor and push it to an object to use later
+async function addStudentInfo() {
+  try {
+    let studenInfoAns = await questionPrompt(gradeQuestions.gradeInput);
+
+    let newStudentSubmit = new submission(
+      assignment,
+      week,
+      studenInfoAns.student_name,
+      studenInfoAns.grade,
+      studenInfoAns.comments
+    );
+
+    gradeQuestions.results.push(newStudentSubmit);
+    console.log(gradeQuestions.results);
+    checkForMore();
+  } catch (err) {
+    console.error(err);
   }
+}
 
-  function checkPath() {
-    let dir = "./readme_created/hwgrades";
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir);
+//check if more students need to be added
+async function checkForMore() {
+  try {
+    let moreStudents = await questionPrompt(gradeQuestions.addMore);
+
+    if (moreStudents.add_more) {
+      addStudentInfo();
     } else {
-      return;
+      console.log("thank you we will now send information to a text file");
+      checkPath();
+      saveFile(
+        "./readme_created/hwgrades/week" + week + ".txt",
+        JSON.stringify(gradeQuestions.results)
+      );
     }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function checkPath() {
+  let dir = "./readme_created/hwgrades";
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  } else {
+    return;
   }
 }
 
 //**********student grade search section**********
 
-function studentGradeSearch(newMessage) {
-  let message = "Welcome to 'Grade Search' !";
+async function studentGradeSearch(newMessage) {
+  try {
+    let message = "Welcome to 'Grade Search' !";
 
-  if (newMessage) {
-    message = newMessage;
-  }
-  console.log(message);
-  inquirer.prompt(gradeSearchQuestions.weekSearch).then(function (res) {
-    console.log(res);
+    if (newMessage) {
+      message = newMessage;
+    }
+    console.log(message);
+    let weekSearch = await questionPrompt(gradeSearchQuestions.weekSearch);
+
     //if res is not a number then alert user and run app again
 
-    if (!isNaN(res.hmwk_week)) {
-      hmwkWeekData = hmwkSearch.searchFile(res.hmwk_week, fs);
+    if (!isNaN(weekSearch.hmwk_week)) {
+      hmwkWeekData = hmwkSearch.searchFile(weekSearch.hmwk_week, fs);
       sortQuestions();
     } else {
       studentGradeSearch("***You can only enter in a number for this input***");
     }
+  } catch (err) {
+    console.error(err);
+  }
 
-    //grab week information from file and then save it in an array to access if needed later. Then start a new function too parse through it based on what the user is looking for
-  });
+  //grab week information from file and then save it in an array to access if needed later. Then start a new function too parse through it based on what the user is looking for
 }
 
 //allows user to search through data by: name, grade, or show all
-function sortQuestions() {
-  inquirer.prompt(gradeSearchQuestions.sortQuestion).then(function (res) {
-    if (res.sort_q === "Show All") {
+async function sortQuestions() {
+  try {
+    let gradeSearchType = await questionPrompt(
+      gradeSearchQuestions.sortQuestion
+    );
+
+    if (gradeSearchType.sort_q === "Show All") {
       hmwkSearch.showData(hmwkWeekData, "all");
       sortQuestions();
     }
-    if (res.sort_q === "Search By Student Name") {
-      inquirer.prompt(gradeSearchQuestions.studentSearch).then(function (res) {
-        hmwkSearch.showData(hmwkWeekData, "name", res.student);
-        sortQuestions();
-      });
-    }
-    if (res.sort_q === "Search by Grade") {
-      inquirer.prompt(gradeSearchQuestions.gradeSearch).then(function (res) {
-        hmwkSearch.showData(hmwkWeekData, "grade", res.hmwkgrade);
-        sortQuestions();
-      });
+    if (gradeSearchType.sort_q === "Search By Student Name") {
+      let name = await questionPrompt(gradeSearchQuestions.studentSearch);
+      hmwkSearch.showData(hmwkWeekData, "name", name.student);
+      sortQuestions();
     }
 
-    if (res.sort_q === "Back to Assignment Search") {
+    if (gradeSearchType.sort_q === "Search by Grade") {
+      console.log("search here grade");
+      let grade = await questionPrompt(gradeSearchQuestions.gradeSearch);
+      hmwkSearch.showData(hmwkWeekData, "grade", grade.hmwkgrade);
+      sortQuestions();
+    }
+
+    if (gradeSearchType.sort_q === "Back to Assignment Search") {
       studentGradeSearch();
     }
-    if (res.sort_q === "Main Menu") {
+    if (gradeSearchType.sort_q === "Main Menu") {
       initializeApp();
     }
-  });
+  } catch (err) {
+    console.error(err);
+  }
 }

@@ -101,7 +101,6 @@ module.exports = {
       }
       //searches for grades equal to the input grade
       if (studentData.grade === grade) {
-        studentData.num = i;
         return studentData;
       }
     });
