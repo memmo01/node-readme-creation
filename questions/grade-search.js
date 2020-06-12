@@ -6,10 +6,11 @@ module.exports = {
   },
   sortQuestion: {
     type: "list",
-    message: "How would you like to see the data?",
+    message: "How would you like to do?",
     choices: [
       "Search By Student Name",
       "Search by Grade",
+      "New Entry",
       "Show All",
       "Back to Assignment Search",
       "Main Menu",

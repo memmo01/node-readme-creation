@@ -94,9 +94,9 @@ function updateReadMeAnswers(url, credit, license) {
 }
 
 //add data to file
-function saveFile(filepath, data) {
+function saveFile(filepath, data, newData) {
   fs.writeFile(filepath, data, function (err) {
-    progressBarLoad(filepath);
+    progressBarLoad(filepath, newData);
     if (err) {
       console.log(err);
     } else {
@@ -105,12 +105,25 @@ function saveFile(filepath, data) {
   });
 }
 
-function progressBarLoad(filepath) {
+function appendData(filepath, data) {
+  fs.appendFile(filepath, data, function (err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("New data appened to file");
+    }
+  });
+}
+
+function progressBarLoad(filepath, newData) {
   var bar = new ProgressBar(":bar", { total: 20 });
   var timer = setInterval(function () {
     bar.tick();
     if (bar.complete) {
       console.log("file created successfully in " + filepath);
+      if (newData) {
+        sortQuestions();
+      }
 
       clearInterval(timer);
     }
@@ -239,10 +252,29 @@ async function sortQuestions() {
     }
 
     if (gradeSearchType.sort_q === "Search by Grade") {
-      console.log("search here grade");
       let grade = await questionPrompt(gradeSearchQuestions.gradeSearch);
       hmwkSearch.showData(hmwkWeekData, "grade", grade.hmwkgrade);
       sortQuestions();
+    }
+
+    if (gradeSearchType.sort_q === "New Entry") {
+      let newEntry = await questionPrompt(gradeQuestions.gradeInput);
+
+      let addedStudent = new submission(
+        hmwkWeekData[0].assignment,
+        hmwkWeekData[0].week,
+        newEntry.student_name,
+        newEntry.grade,
+        newEntry.comments
+      );
+      hmwkWeekData.push(addedStudent);
+      saveFile(
+        `./readme_created/hwgrades/week${hmwkWeekData[0].week}.txt`,
+        JSON.stringify(hmwkWeekData),
+        true
+      );
+
+      //append new data to the text file
     }
 
     if (gradeSearchType.sort_q === "Back to Assignment Search") {

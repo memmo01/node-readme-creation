@@ -35,10 +35,17 @@ module.exports = {
        Name: ${person.name}
        Assignment: ${person.assignment}
        Week: ${person.week}
-       Grade: ${person.grade}
-       ____________________
-       `;
+       Grade: ${person.grade}`;
+
+      if (person.comments) {
+        personData += `
+       Comments: ${person.comments}`;
+      }
+      personData += `
+      ____________________`;
     });
+
+    //if there are comments, add this to the object
 
     //displays data
     console.log(personData);
